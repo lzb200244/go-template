@@ -19,7 +19,7 @@ mysql:
   host: 'localhost'
   port: '3306'
   config: 'charset=utf8mb4&parseTime=True&loc=Local'
-  db-name: 'test'
+  db-name: 'gintemplate'
   username: 'root'
   password: 'root'
   prefix: "t_" # 全局表前缀，单独定义 TableName 则不生效

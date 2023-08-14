@@ -1,19 +1,16 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"go-template/global"
 	"go-template/initialize"
-	"net/http"
+	"go-template/router"
 )
 
 func main() {
 	//进行初始化
 	Init()
-	r := gin.New()
-	r.GET("ping/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "pong")
-	})
+	r := router.InitApiRouter()
+
 	r.Run(":" + global.Config.Project.Port)
 }
 

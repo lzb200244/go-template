@@ -13,6 +13,7 @@ Description：
 */
 
 func Migrate() {
+
 	err := global.MysqlDB.AutoMigrate(
 		User{},
 	)
