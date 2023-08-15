@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"go-template/global/auth"
 	"go-template/global/code"
 	"go-template/models"
 	"go-template/models/response"
@@ -30,44 +31,52 @@ func NewUser(username string, password string, email string) *UserRegister {
 		Username: username, Password: password, Email: email,
 	}
 }
-func Register(username string, password string, email string) (int, error) {
+func Register(username string, password string, email string) (interface{}, code.Code) {
 	return NewUser(username, password, email).Do()
 }
-func (r UserRegister) Do() (int, error) {
-	if c, err := r.CheckExists(); err != nil {
-		return c, err
+func (r UserRegister) Do() (interface{}, code.Code) {
+	_, c := r.checkExists()
+	if c != code.OK {
+		return nil, c
 	}
-	if c, err := r.Create(); err != nil {
-		fmt.Println(err)
-		return c, err
+	_, c = r.create()
+	if c != code.OK {
+		return nil, c
 	}
 
-	return code.OK, nil
+	return nil, code.OK
 }
-func (r UserRegister) CheckExists() (int, error) {
+
+// 用户是否存在
+func (r UserRegister) checkExists() (interface{}, code.Code) {
 	//TODO 邮箱为进行校验且存在unique
 	_, err := respository.GetOne(&models.User{}, "user_name", r.Username)
 	//不存在该用户
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return code.OK, nil
+			return nil, code.OK
 		}
 		//数据库异常错误
-		return code.ERROR_DB_OPE, errors.New(code.GetMsg(code.ERROR_DB_OPE))
+		return nil, code.ERROR_DB_OPE
 	}
-	return code.ERROR_USER_NAME_USED, errors.New(code.GetMsg(code.ERROR_USER_NAME_USED))
+	return nil, code.ERROR_DB_OPE
 }
-func (r UserRegister) Create() (int, error) {
+
+// 创建用户
+func (r UserRegister) create() (interface{}, code.Code) {
 	user := models.User{UserName: r.Username, Password: r.Password, Email: r.Email}
 	user.SetPassword() // 加密
 
 	err := respository.Create(&user)
+
+	//给用户赋予权限
+	respository.AddUserAuthority(user, []int{auth.User})
 	if err != nil {
 		fmt.Println(err)
 		//TODO 记录日志
-		return code.ERROR_DB_OPE, errors.New(code.GetMsg(code.ERROR_DB_OPE))
+		return nil, code.ERROR_DB_OPE
 	}
-	return code.OK, err
+	return nil, code.OK
 
 }
 
@@ -81,17 +90,17 @@ type UserLogin struct {
 func NewUserLogin(username string, password string) *UserLogin {
 	return &UserLogin{Username: username, Password: password}
 }
-func Login(username string, password string) (interface{}, int) {
+func Login(username string, password string) (interface{}, code.Code) {
 	return NewUserLogin(username, password).Do()
 }
-func (r UserLogin) Do() (interface{}, int) {
+func (r UserLogin) Do() (interface{}, code.Code) {
 	data, c := r.CheckAndSign()
 	if c != code.OK {
 		return nil, c
 	}
 	return data, code.OK
 }
-func (r UserLogin) CheckAndSign() (interface{}, int) {
+func (r UserLogin) CheckAndSign() (interface{}, code.Code) {
 
 	userObj, err := respository.GetOne(&models.User{}, "user_name", r.Username)
 	if err != nil {

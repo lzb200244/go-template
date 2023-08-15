@@ -32,9 +32,7 @@ func (v *ValidateUtil) Validate(data any) error {
 
 	err := validate.Struct(data)
 	if err != nil {
-
 		for _, e := range err.(validator.ValidationErrors) {
-
 			return errors.New(e.Translate(trans))
 		}
 	}

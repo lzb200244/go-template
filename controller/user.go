@@ -22,7 +22,7 @@ func RegisterController(ctx *gin.Context) {
 		utils.Fail(ctx, code.ERROR_REQUEST_PARAM, err.Error(), nil)
 		return
 	}
-	c, err := service.Register(validate.Username, validate.Password, validate.Email)
+	_, c := service.Register(validate.Username, validate.Password, validate.Email)
 	if err != nil {
 		utils.Fail(ctx, c, err.Error(), nil)
 		return

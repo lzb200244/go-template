@@ -10,7 +10,6 @@ func main() {
 	//进行初始化
 	Init()
 	r := router.InitApiRouter()
-
 	r.Run(":" + global.Config.Project.Port)
 }
 

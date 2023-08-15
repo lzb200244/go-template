@@ -9,7 +9,7 @@ import (
 /*
 Created by 斑斑砖 on 2023/8/14.
 Description：
-
+	绑定、获取参数
 */
 
 // BindValidJson Json 绑定验证 + 合法性校验

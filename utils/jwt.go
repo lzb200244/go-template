@@ -2,11 +2,11 @@ package utils
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"os"
+	"go-template/global"
 	"time"
 )
 
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var secret = []byte(global.Config.Jwt.SECRET)
 
 type Claims struct {
 	Id        uint   `json:"id"`
@@ -19,7 +19,7 @@ type Claims struct {
 // GenerateToken 签发用户Token
 func GenerateToken(id uint, username, email string, authority int) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(24 * time.Hour)
+	expireTime := nowTime.Add(time.Hour * global.Config.Jwt.Expire)
 	claims := Claims{
 		Id:        id,
 		Username:  username,
@@ -27,18 +27,18 @@ func GenerateToken(id uint, username, email string, authority int) (string, erro
 		Authority: authority,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
-			Issuer:    "bbz",
+			Issuer:    global.Config.Jwt.Issuer,
 		},
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(jwtSecret)
+	token, err := tokenClaims.SignedString(secret)
 	return token, err
 }
 
 // ParseToken 验证用户token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return secret, nil
 	})
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {

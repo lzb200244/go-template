@@ -13,7 +13,7 @@ Description：
 */
 
 type Response struct {
-	Code    int         `json:"code"`
+	Code    code.Code   `json:"code"`
 	Data    interface{} `json:"data"`
 	Message string      `json:"msg"`
 }
@@ -27,17 +27,17 @@ type Page struct {
 
 // ResponsePage  返回存在页数的
 type ResponsePage struct {
-	Code    int    `json:"code"`
-	Message string `json:"msg"`
-	Data    *Page  `json:"data"`
+	Code    code.Code `json:"code"`
+	Message string    `json:"msg"`
+	Data    *Page     `json:"data"`
 }
 
-func returnJson(ctx *gin.Context, status, code int, data interface{}, msg string) {
+func returnJson(ctx *gin.Context, status int, code code.Code, data interface{}, msg string) {
 	ctx.JSON(
 		status, Response{Code: code, Message: msg, Data: data},
 	)
 }
-func returnPage(ctx *gin.Context, status, code, page, pageSize, count int, msg string, results []interface{}) {
+func returnPage(ctx *gin.Context, status int, code code.Code, page, pageSize, count int, msg string, results []interface{}) {
 	ctx.JSON(
 		status, ResponsePage{
 			Code: code, Message: msg, Data: &Page{
@@ -54,7 +54,7 @@ func Results(ctx *gin.Context, page, pageSize, count int, msg string, results []
 		ctx, http.StatusOK, code.OK, page, pageSize, count, msg, results,
 	)
 }
-func Fail(ctx *gin.Context, code int, msg string, data interface{}) {
+func Fail(ctx *gin.Context, code code.Code, msg string, data interface{}) {
 	returnJson(ctx, http.StatusBadRequest, code, data, msg)
 	ctx.Abort()
 }

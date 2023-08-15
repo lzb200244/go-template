@@ -11,11 +11,11 @@ Description：
 // Role 用户角色对应关系
 type Role struct {
 	gorm.Model
-	Name        string
+	Name        string       `json:"name"`
 	Permissions []Permission `gorm:"many2many:role_permissions;"`
 }
 
 type Permission struct {
 	gorm.Model
-	Name string
+	Name string `json:"name"`
 }

@@ -13,6 +13,7 @@ Description：
 // Create 创建数据(可以创建[单条]数据, 也可[批量]创建)
 func Create[T any](data *T) error {
 	err := global.MysqlDB.Create(&data).Error
+
 	return err
 }
 
