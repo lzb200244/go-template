@@ -107,7 +107,7 @@ func (r UserLogin) CheckAndSign() (interface{}, int) {
 		return nil, code.ERROR_PASSWORD_WRONG
 	}
 	//校验通过生成Token
-	token, err := utils.GenerateToken(userObj.ID, userObj.UserName, 10)
+	token, err := utils.GenerateToken(userObj.ID, userObj.UserName, userObj.Email, 10)
 	if err != nil {
 		//签发token失败
 		return nil, code.ERROR_TOKEN_CREATE
